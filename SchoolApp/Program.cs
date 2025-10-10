@@ -49,6 +49,33 @@ namespace SchoolApp
                 };
             });
 
+            builder.Services.AddCors(options =>
+            {
+                options.AddPolicy("AngularClient", 
+                    b => b.WithOrigins("https://localhost:4200")
+                        .AllowAnyMethod()
+                        .AllowAnyHeader()
+                );
+            });
+
+            builder.Services.AddCors(options =>
+            {
+                options.AddPolicy("LocalClient",
+                    b => b.WithOrigins("https://localhost:5001")
+                        .AllowAnyMethod()
+                        .AllowAnyHeader()
+                );
+            });
+
+            builder.Services.AddCors(options =>
+            {
+                options.AddPolicy("AllowAll",
+                    b => b.AllowAnyOrigin()
+                        .AllowAnyMethod()
+                        .AllowAnyHeader()
+                );
+            });
+
             // Add services to the container.
 
             builder.Services.AddControllers();
@@ -66,6 +93,8 @@ namespace SchoolApp
             }
 
             app.UseHttpsRedirection();
+
+            app.UseCors("AllowAll");
             app.UseAuthentication();
             app.UseAuthorization();
 
