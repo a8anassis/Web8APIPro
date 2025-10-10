@@ -2,11 +2,14 @@
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Converters;
 using SchoolApp.Configuration;
 using SchoolApp.Data;
 using SchoolApp.Repositories;
 using Serilog;
 using System.Text;
+using System.Text.Json.Serialization;
 
 namespace SchoolApp
 {
@@ -22,7 +25,7 @@ namespace SchoolApp
             builder.Services.AddDbContext<SchoolAppDbContext>(options => options.UseSqlServer(connString));
             builder.Services.AddRepositories();
             builder.Services.AddAutoMapper(cfg => cfg.AddProfile<MapperConfig>());
-            builder.Host.UseSerilog((ctx, lc) => 
+            builder.Host.UseSerilog((ctx, lc) =>
                 lc.ReadFrom.Configuration(ctx.Configuration));
 
             builder.Services.AddAuthentication(options =>
@@ -51,7 +54,7 @@ namespace SchoolApp
 
             builder.Services.AddCors(options =>
             {
-                options.AddPolicy("AngularClient", 
+                options.AddPolicy("AngularClient",
                     b => b.WithOrigins("https://localhost:4200")
                         .AllowAnyMethod()
                         .AllowAnyHeader()
@@ -76,9 +79,23 @@ namespace SchoolApp
                 );
             });
 
-            // Add services to the container.
 
-            builder.Services.AddControllers();
+
+            //builder.Services.AddControllers().AddJsonOptions(options =>
+            //{
+            //    options.JsonSerializerOptions.DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull;
+            //    options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
+
+            //});
+
+            builder.Services.AddControllers().AddNewtonsoftJson(options =>
+            {
+                options.SerializerSettings.NullValueHandling = NullValueHandling.Ignore;
+                options.SerializerSettings.ReferenceLoopHandling = ReferenceLoopHandling.Serialize;
+                options.SerializerSettings.Converters.Add(new StringEnumConverter());
+            });
+
+
             // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
             builder.Services.AddEndpointsApiExplorer();
             builder.Services.AddSwaggerGen();
