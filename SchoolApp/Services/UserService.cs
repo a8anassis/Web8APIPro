@@ -146,5 +146,52 @@ namespace SchoolApp.Services
 
             return userToken;
         }
- }
+
+        public async Task<UserReadOnlyDTO> GetUserByIdAsync(int id)
+        {
+            User? user = null;
+
+            try
+            {
+                user = await unitOfWork.UserRepository.GetAsync(id);
+                logger.LogInformation("User found with ID: {Id}", id);
+            }
+            catch (EntityNotFoundException ex)
+            {
+                logger.LogError("Error retrieving user by ID: {Id}. {Message}", id, ex.Message);
+            }
+            return mapper.Map<UserReadOnlyDTO>(user);
+        }
+
+        public async Task<UserTeacherReadOnlyDTO?> GetUserTeacherByUsernameAsync(string username)
+        {
+            UserTeacherReadOnlyDTO? userTeacherReadOnlyDTO = null;
+            try
+            {
+                var user = await unitOfWork.UserRepository.GetUserByUsernameAsync(username);
+                if (user == null)
+                {
+                    throw new EntityNotFoundException("User", "User with username: " + username + " not found");
+                    //return null;
+                }
+                logger.LogInformation("User found with username={Username}", username);
+                userTeacherReadOnlyDTO =  new UserTeacherReadOnlyDTO
+                {
+                    Id = user.Id,
+                    Username = user.Username,
+                    Email = user.Email,
+                    Firstname = user.Firstname,
+                    Lastname = user.Lastname,
+                    UserRole = user.UserRole.ToString()!,
+                };
+                return userTeacherReadOnlyDTO;
+            }
+            catch (EntityNotFoundException e)
+            {
+                logger.LogError("Error retrieving user by username: {Username}. {Message}", username, e.Message);
+                throw;
+            }
+            //return userTeacherReadOnlyDTO;
+        }
+    }
 }
