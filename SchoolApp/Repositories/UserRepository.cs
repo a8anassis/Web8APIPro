@@ -53,5 +53,15 @@ namespace SchoolApp.Repositories
 
             return new PaginatedResult<User>(data, totalRecords, pageNumber, pageSize);
         }
+
+        public async Task<User?> GetUserTeacherAsync(string? username)
+        {
+            var userTeacher = await context.Users
+                .Where(u => u.Username == username)
+                .Include(u  => u.Teacher)
+                .FirstOrDefaultAsync();
+
+            return userTeacher;
+        } 
     }
 }
