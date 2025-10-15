@@ -26,6 +26,9 @@ namespace SchoolApp
 
             builder.Services.AddDbContext<SchoolAppDbContext>(options => options.UseSqlServer(connString));
             builder.Services.AddRepositories();
+
+            // ToDo Add Services
+
             builder.Services.AddAutoMapper(cfg => cfg.AddProfile<MapperConfig>());
             builder.Host.UseSerilog((ctx, lc) =>
                 lc.ReadFrom.Configuration(ctx.Configuration));
@@ -98,12 +101,11 @@ namespace SchoolApp
             });
 
             builder.Services.AddEndpointsApiExplorer();
+           
             builder.Services.AddSwaggerGen(options =>
             {
-
                 options.SwaggerDoc("v1", new OpenApiInfo { Title = "School App", Version = "v1" });
                 // options.SupportNonNullableReferenceTypes(); // default true > .NET 6
-                options.OperationFilter<AuthorizeOperationFilter>();
                 options.AddSecurityDefinition(JwtBearerDefaults.AuthenticationScheme,
                     new OpenApiSecurityScheme
                     {
@@ -114,7 +116,7 @@ namespace SchoolApp
                         Scheme = JwtBearerDefaults.AuthenticationScheme,
                         BearerFormat = "JWT"
                     });
-
+                options.OperationFilter<AuthorizeOperationFilter>();
             });
 
             var app = builder.Build();
@@ -128,11 +130,12 @@ namespace SchoolApp
 
             app.UseHttpsRedirection();
 
-            app.UseCors("AllowAll");
+            app.UseCors("LocalClient");
+
             app.UseAuthentication();
             app.UseAuthorization();
 
-
+            app.UseMiddleware<ErrorHandlerMiddleware>();
             app.MapControllers();
 
             app.Run();
