@@ -127,7 +127,7 @@ namespace SchoolApp
             if (app.Environment.IsDevelopment())
             {
                 app.UseSwagger();
-                app.UseSwaggerUI();
+                app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "School App v1"));
             }
 
             app.UseHttpsRedirection();
