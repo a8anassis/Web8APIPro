@@ -9,6 +9,7 @@ using SchoolApp.Configuration;
 using SchoolApp.Data;
 using SchoolApp.Helpers;
 using SchoolApp.Repositories;
+using SchoolApp.Services;
 using Serilog;
 using System.Text;
 using System.Text.Json.Serialization;
@@ -26,6 +27,7 @@ namespace SchoolApp
 
             builder.Services.AddDbContext<SchoolAppDbContext>(options => options.UseSqlServer(connString));
             builder.Services.AddRepositories();
+            builder.Services.AddScoped<IApplicationService, ApplicationService>();
 
             // ToDo Add Services
 

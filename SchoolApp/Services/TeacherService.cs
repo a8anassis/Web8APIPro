@@ -24,7 +24,7 @@ namespace SchoolApp.Services
         public async Task SignUpUserAsync(TeacherSignupDTO request)
         {
             Teacher teacher = ExtractTeacher(request);
-            User user = ExtractUser(request); ;
+            User user = ExtractUser(request);
 
             try
             {

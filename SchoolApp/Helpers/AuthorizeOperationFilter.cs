@@ -44,7 +44,6 @@ namespace SchoolApp.Helpers
                         },
                         roles.ToList()
                     }
-
                 });
             }
         }
