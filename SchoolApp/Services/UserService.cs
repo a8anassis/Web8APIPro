@@ -120,7 +120,8 @@ namespace SchoolApp.Services
             return user;
         }
 
-        public string CreateUserToken(int userId, string username, string email, UserRole userRole, string appSecurityKey)
+        public string CreateUserToken(int userId, string username, string email, UserRole userRole, 
+            string appSecurityKey)
         {
             var securityKey = new SymmetricSecurityKey(Encoding.ASCII.GetBytes(appSecurityKey));
             var signingCredentials = new SigningCredentials(securityKey, SecurityAlgorithms.HmacSha256);
@@ -154,13 +155,18 @@ namespace SchoolApp.Services
             try
             {
                 user = await unitOfWork.UserRepository.GetAsync(id);
+                if (user == null)
+                {
+                    throw new EntityNotFoundException("User", "User with id: " + id + " not found");
+                }
                 logger.LogInformation("User found with ID: {Id}", id);
+                return mapper.Map<UserReadOnlyDTO>(user);
             }
             catch (EntityNotFoundException ex)
             {
                 logger.LogError("Error retrieving user by ID: {Id}. {Message}", id, ex.Message);
-            }
-            return mapper.Map<UserReadOnlyDTO>(user);
+                throw;
+            }   
         }
 
         public async Task<UserTeacherReadOnlyDTO?> GetUserTeacherByUsernameAsync(string username)
@@ -168,22 +174,14 @@ namespace SchoolApp.Services
             UserTeacherReadOnlyDTO? userTeacherReadOnlyDTO = null;
             try
             {
-                var user = await unitOfWork.UserRepository.GetUserByUsernameAsync(username);
-                if (user == null)
+                userTeacherReadOnlyDTO = await unitOfWork.UserRepository.GetUserTeacherAsync(username);
+                if (userTeacherReadOnlyDTO == null)
                 {
                     throw new EntityNotFoundException("User", "User with username: " + username + " not found");
                     //return null;
                 }
                 logger.LogInformation("User found with username={Username}", username);
-                userTeacherReadOnlyDTO =  new UserTeacherReadOnlyDTO
-                {
-                    Id = user.Id,
-                    Username = user.Username,
-                    Email = user.Email,
-                    Firstname = user.Firstname,
-                    Lastname = user.Lastname,
-                    UserRole = user.UserRole.ToString()!,
-                };
+              
                 return userTeacherReadOnlyDTO;
             }
             catch (EntityNotFoundException e)

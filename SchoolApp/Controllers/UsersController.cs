@@ -35,10 +35,15 @@ namespace SchoolApp.Controllers
         [HttpGet("{id}")]
         public async Task<ActionResult<UserReadOnlyDTO>> GetUserById(int id)
         {
-            UserReadOnlyDTO userReadOnlyDTO = await applicationService.UserService.GetUserByIdAsync(id) 
-                ?? throw new EntityNotFoundException("User", "User with id " + id + " not found");
-           
+            UserReadOnlyDTO userReadOnlyDTO = await applicationService.UserService.GetUserByIdAsync(id);
             return Ok(userReadOnlyDTO);
+        }
+
+        [HttpGet("{username}")]
+        public async Task<ActionResult<UserTeacherReadOnlyDTO>> GetUserTeacherByUsernameAsync(string? username)
+        {
+            var returnedUserDTO = await applicationService.UserService.GetUserTeacherByUsernameAsync(username!);
+            return Ok(returnedUserDTO);
         }
 
         [HttpPost]
@@ -51,13 +56,6 @@ namespace SchoolApp.Controllers
                 user.UserRole, configuration["Authentication:SecretKey"]!);
             JwtTokenDTO userToken = new JwtTokenDTO { Token = token };
             return Ok(userToken);
-        }
-
-        [HttpGet("{username}")]
-        public async Task<ActionResult<UserTeacherReadOnlyDTO>> GetUserTeacherByUsernameAsync(string? username)
-        {
-            var returnedUserDTO = await applicationService.UserService.GetUserTeacherByUsernameAsync(username!);
-            return Ok(returnedUserDTO);
-        }
+        }   
     }
 }
