@@ -8,9 +8,7 @@ namespace SchoolApp.Configuration
     {
         public MapperConfig()
         {
-            CreateMap<User, UserReadOnlyDTO>().ReverseMap();
-            
+            CreateMap<User, UserReadOnlyDTO>().ReverseMap();   
         }
-
     }
 }
